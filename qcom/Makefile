@@ -1,5 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0
 
+ifeq ($(CONFIG_ARCH_WAIPIO), y)
+DTC_INCLUDE += \
+	$(srctree)/../sm8450-modules/qcom/opensource/audio-kernel/include \
+	$(srctree)/../sm8450-modules/qcom/opensource/camera-kernel \
+	$(srctree)/../sm8450-modules/qcom/opensource/synx-kernel
+endif
+
 # add-overlay defines the target with following naming convention:
 # <base>-<board>-dtbs = base.dtb board.dtbo
 #
@@ -277,6 +284,15 @@ parrot-dtb-$(CONFIG_ARCH_RAVELIN) += \
 parrot-overlays-dtb-$(CONFIG_ARCH_RAVELIN) += $(RAVELIN_BOARDS) $(RAVELIN_BASE_DTB) $(RAVELIN_4GB_BOARDS) $(RAVELIN_4GB_BASE_DTB)
 dtb-y += $(parrot-dtb-y)
 
+CAPE_BASE_DTB += cape.dtb
+
+CAPE_BOARDS += \
+		cape-qrd-pm8010-overlay.dtbo
+
+cape-dtb-$(CONFIG_ARCH_CAPE) += \
+	$(call add-overlays, $(CAPE_BOARDS),$(CAPE_BASE_DTB))
+dtb-y += $(cape-dtb-y)
+
 endif
 
 ifeq ($(CONFIG_ARCH_PINEAPPLE), y)
@@ -434,5 +450,7 @@ endif
 
 always-y        := $(dtb-y)
 subdir-y        := $(dts-dirs)
+ifneq ($(CONFIG_ARCH_WAIPIO), y)
 subdir-y        += audio bt camera data display dsp eSE graphics mm mmrm mm-sys nfc synx video wlan
+endif
 clean-files     := *.dtb *.dtbo
